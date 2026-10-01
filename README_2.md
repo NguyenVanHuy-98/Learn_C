@@ -2833,64 +2833,95 @@ ví dụ:
 ```cpp 
 #include <iostream>
 
-void gpioInit();
-
-void gpioSetPin(int pin, bool value);
-
-void gpioReadPin(int pin);
-
-class GpioManager{
-    private:
-        GpioManager();
-        static GpioManager* instance;
-        void init(){
-            gpioInit();
-        }
-    public:
-        static GpioManager *getInstace(){
-            if(!instance){
-                instance = new GpioManager(); // 0xc8
-                instance->init();
-                // bổ sung thêm tính năng
-            }
-            return instance;
-        }
-        void setPin(int pin, bool value){
-            gpioSetPin(pin, value);
-        }
-        void readPin(int pin){
-            gpioReadPin(pin);
-        }
-};
-
-class PORTx{
-    private:
-        PORTx();
-        static PORTx* instance;
-        void init(){
-            //gpioInit();
-        }
-    public:
-        static PORTx *getInstace(){
-            if(!instance){
-                instance = new PORTx();
-                instance->init();
-            }
-            return instance;
-        }
-};
-
-GpioManager* GpioManager::instance = nullptr; // 0xc8 : địa chỉ cố định
-
-int main(int argc, char const *argv[])
+void gpioInit()
 {
-    GpioManager* gpioManager = GpioManager::getInstace();
+    std::cout << "GPIO Init\n";
+}
 
-    gpioManager->setPin();
+void gpioSetPin(int pin, bool value)
+{
+    std::cout << "GPIO "
+              << pin
+              << " = "
+              << value
+              << '\n';
+}
 
-    gpioManager->readPin();
+void gpioReadPin(int pin)
+{
+    std::cout << "Read GPIO "
+              << pin
+              << '\n';
+}
 
-    GpioManager* gpioManager2 = GpioManager::getInstace();
+
+class GpioManager
+{
+private:
+
+    GpioManager()
+    {
+        std::cout << "GpioManager Constructor\n";
+    }
+
+    static GpioManager* instance;
+
+    void init()
+    {
+        gpioInit();
+    }
+
+public:
+
+    static GpioManager* getInstance()
+    {
+        if(instance == nullptr)
+        {
+            instance = new GpioManager();
+
+            instance->init();
+        }
+
+        return instance;
+    }
+
+    void setPin(int pin, bool value)
+    {
+        gpioSetPin(pin, value);
+    }
+
+    void readPin(int pin)
+    {
+        gpioReadPin(pin);
+    }
+};
+
+
+GpioManager* GpioManager::instance = nullptr;
+
+
+int main()
+{
+    GpioManager* gpioManager1 =
+        GpioManager::getInstance();
+
+    gpioManager1->setPin(10, true);
+
+    gpioManager1->readPin(10);
+
+
+    GpioManager* gpioManager2 =
+        GpioManager::getInstance();
+
+
+    std::cout << "Address 1: "
+              << gpioManager1 << '\n';
+
+    std::cout << "Address 2: "
+              << gpioManager2 << '\n';
+
+    std::cout << (gpioManager1 == gpioManager2)
+              << '\n';
 
     return 0;
 }
